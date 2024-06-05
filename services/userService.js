@@ -1,55 +1,25 @@
+
 const userRepository = require('../repositories/userRepository');
 const jsonwebtoken = require('jsonwebtoken');
-const env = require('dotenv');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const User = require('../models/userModel');
-env.config();
-
-const createUser = async (req) => {
-  const { name, email, password } = req;
-  if (name == null || email == null || password == null) {
-    return { msg: 'Please include all required fields' };
-  }
-  return await userRepository.createUser(req);
-};
-
-const checkUser = async (req) => {
-  const { email, password } = req;
-  if (email == null || password == null) {
-    return { msg: 'Please include all required fields' };
-  }
-  const user = await userRepository.getUser(email);
-  if (user != null) {
-    if (password != user.password) {
-      return false;
-    } else {
-      const token = jsonwebtoken.sign(
-        { email: user.email, userid: user.id },
-        process.env.TOKEN_KEY,
-        { expiresIn: '1d' }
-      );
-      return token;
-    }
-  } else {
-    return false;
-  }
-};
 
 const registerUser = async (userData) => {
   const { name, email, password } = userData;
-  const existingUser = await User.findOne({ email });
+  const existingUser = await userRepository.getUser(email);
 
   if (existingUser) {
     return { msg: 'User already exists' };
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await userRepository.createUser({
+    name,
+    email,
+    password: hashedPassword,
+  });
 
-  const user = new User({ name, email, password: hashedPassword });
-  await user.save();
-
-  return { msg: 'User registered successfully' };
+  return user;
 };
 
 const loginUser = async (userData) => {
@@ -66,7 +36,7 @@ const loginUser = async (userData) => {
     return { msg: 'Invalid password' };
   }
 
-  const token = jwt.sign({ id: user._id }, process.env.TOKEN_KEY, {
+  const token = jsonwebtoken.sign({ id: user._id }, process.env.TOKEN_KEY, {
     expiresIn: '1h',
   });
 
@@ -91,9 +61,7 @@ const verifyToken = (req, res, next) => {
 };
 
 module.exports = {
-  createUser,
-  checkUser,
-  verifyToken,
   registerUser,
   loginUser,
+  verifyToken,
 };
