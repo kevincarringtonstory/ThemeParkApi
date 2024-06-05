@@ -1,4 +1,3 @@
-
 const userRepository = require('../repositories/userRepository');
 const jsonwebtoken = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -56,6 +55,7 @@ const verifyToken = (req, res, next) => {
         message: 'Unauthorized',
       });
     }
+    req.user = { id: decoded.id }; // Ensure this line correctly sets req.user
     next();
   });
 };
