@@ -42,26 +42,7 @@ const loginUser = async (userData) => {
   return token;
 };
 
-const verifyToken = (req, res, next) => {
-  let token = req.headers['x-access-token'];
-  if (!token) {
-    return res.status(403).send({
-      message: 'No Token Provided',
-    });
-  }
-  jsonwebtoken.verify(token, process.env.TOKEN_KEY, (err, decoded) => {
-    if (err) {
-      return res.status(403).send({
-        message: 'Unauthorized',
-      });
-    }
-    req.user = { id: decoded.id }; // Ensure this line correctly sets req.user
-    next();
-  });
-};
-
 module.exports = {
   registerUser,
   loginUser,
-  verifyToken,
 };

@@ -3,11 +3,12 @@ const router = express.Router();
 const rideController = require('../controllers/rideController');
 const { deleteRideHandler } = require('../controllers/rideController');
 const { updateRideHandler } = require('../controllers/rideController');
-const userService = require('../services/userService');
+const verifyAdmin = require('../middlewares/verifyAdmin');
+const verifyToken = require('../middlewares/verifyToken');
 
-router.get('/', rideController.getAll);
-router.post('/', [userService.verifyToken], rideController.createRide);
-router.delete('/:id', deleteRideHandler);
-router.put('/:id', updateRideHandler);
+router.get('/', rideController.getAll); //testing verifyAdmin
+router.post('/', [verifyToken, verifyAdmin], rideController.createRide);
+router.delete('/:id', [verifyToken, verifyAdmin], deleteRideHandler);
+router.put('/:id', [verifyToken, verifyAdmin], updateRideHandler);
 
 module.exports = router;
