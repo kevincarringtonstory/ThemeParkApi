@@ -13,6 +13,15 @@ app.use('/rides', rideRoute);
 app.use('/users', userRoute);
 app.use('/tickets', ticketRoute);
 
+<<<<<<< HEAD
+=======
+// Centralized error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+>>>>>>> 3bc4ec39e41ab9a09a8c451bf93264cea0e835b5
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
